@@ -7,13 +7,16 @@ import csv
 
 import constant
 
-with open('word_crawling.csv', 'w', newline='', encoding='utf-8') as csv_file:
+with open('/Users/bagchaegyeong/Desktop/word_crawling.csv', 'w', newline='', encoding='utf-8-sig') as csv_file:
     word_writer = csv.writer(csv_file, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
 
     driver = webdriver.Chrome(ChromeDriverManager().install())
     word_writer.writerow(['용어', '예문'])
     words = [
         "스크럼", "스프린트", "애자일", "사일로", "피봇", "마일스톤", "린", "MVP"
+    ]
+    except_ws = [
+        "의미", "용어", "표현", "한다", "라고", "합니다", "말한다", "말합니다", "란", "이란"
     ]
     try:
         for word in words:
@@ -45,10 +48,16 @@ with open('word_crawling.csv', 'w', newline='', encoding='utf-8') as csv_file:
                 if (text.find("예") > 0 or text.find("\"") > 0) and text.find(word) > 0:  # 예문이 포함되어 있는 링크인지 확인
                     lines = text.replace("\n", "").replace("“", ".").replace("\"", ".").split(".")
                     for line in lines:
-                        if line.find(word) > 0 and len(line) > 7:  # 예문 찾기
+                        Flag = 1
+                        for except_w in except_ws:
+                            # print(except_w)
+                            if line.find(except_w) > 0:
+                                Flag = 0
+                                break
+                        if line.find(word) > 0 and len(line) > 7 and line.find(' ') > 0 and Flag != 0:  # 예문 찾기
                             print(line)
                             word_writer.writerow([word, line])
-                            print("=========================================================")
+                            print("="*60)
                         else:
                             pass
                 driver.back()
